@@ -13,8 +13,8 @@ type Config struct {
 	Timeout               time.Duration                            // timeout for the command
 	TriggerWord           string                                   // trigger word to trigger the onTrigger function
 	OnlyTriggerOnLastLine bool                                     // only trigger on the last line of the output
-	onTrigger             func(channel int, content string) string // function to handle the trigger
-	onOutput              func(channel int, content []byte)        // function to handle the output
+	OnTrigger             func(channel int, content string) string // function to handle the trigger
+	OnOutput              func(channel int, content []byte)        // function to handle the output
 }
 
 type Payload struct {
@@ -23,7 +23,7 @@ type Payload struct {
 }
 
 func Hook(config *Config, cmd string, args ...string) error {
-	if config.onTrigger == nil {
+	if config.OnTrigger == nil {
 		return errors.New("onTrigger is required")
 	}
 
@@ -68,8 +68,8 @@ func Hook(config *Config, cmd string, args ...string) error {
 				break
 			}
 
-			if config.onOutput != nil {
-				config.onOutput(payload.Channel, payload.Message)
+			if config.OnOutput != nil {
+				config.OnOutput(payload.Channel, payload.Message)
 			}
 			//if payload.Channel == 1 {
 			//	_, _ = fmt.Fprint(os.Stdout, payload.Message)
@@ -84,7 +84,7 @@ func Hook(config *Config, cmd string, args ...string) error {
 					lines := strings.Split(output, "\n")
 					output = strings.TrimSpace(lines[len(lines)-1])
 				}
-				input := config.onTrigger(payload.Channel, output)
+				input := config.OnTrigger(payload.Channel, output)
 				if input != "" {
 					outputCache[payload.Channel] = []byte{}
 					_, err := stdin.Write([]byte(input))
