@@ -15,13 +15,13 @@ func TestHook(t *testing.T) {
 		Timeout:               5 * time.Second,
 		TriggerWord:           ":",
 		OnlyTriggerOnLastLine: true,
-		onTrigger: func(channel int, content string) string {
+		OnTrigger: func(channel int, content string) string {
 			if content == "Please enter your password:" {
 				return Password + "\n"
 			}
 			return ""
 		},
-		onOutput: func(channel int, content []byte) {
+		OnOutput: func(channel int, content []byte) {
 			output = append(output, content...)
 		},
 	}
