@@ -10,10 +10,11 @@ import (
 )
 
 type Config struct {
-	Timeout     time.Duration                            // timeout for the command
-	TriggerWord string                                   // trigger word to trigger the onTrigger function
-	onTrigger   func(channel int, content string) string // function to handle the trigger
-	onOutput    func(channel int, content []byte)        // function to handle the output
+	Timeout               time.Duration                            // timeout for the command
+	TriggerWord           string                                   // trigger word to trigger the onTrigger function
+	OnlyTriggerOnLastLine bool                                     // only trigger on the last line of the output
+	onTrigger             func(channel int, content string) string // function to handle the trigger
+	onOutput              func(channel int, content []byte)        // function to handle the output
 }
 
 type Payload struct {
@@ -79,6 +80,10 @@ func Hook(config *Config, cmd string, args ...string) error {
 
 			output := string(outputCache[payload.Channel])
 			if strings.HasSuffix(strings.TrimSpace(output), config.TriggerWord) {
+				if config.OnlyTriggerOnLastLine {
+					lines := strings.Split(output, "\n")
+					output = strings.TrimSpace(lines[len(lines)-1])
+				}
 				input := config.onTrigger(payload.Channel, output)
 				if input != "" {
 					outputCache[payload.Channel] = []byte{}
