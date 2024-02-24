@@ -78,8 +78,8 @@ func Hook(config *Config, cmd string, args ...string) error {
 			//}
 			outputCache[payload.Channel] = append(outputCache[payload.Channel], payload.Message...)
 
-			output := string(outputCache[payload.Channel])
-			if strings.HasSuffix(strings.TrimSpace(output), config.TriggerWord) {
+			output := strings.TrimSpace(string(outputCache[payload.Channel]))
+			if strings.HasSuffix(output, config.TriggerWord) {
 				if config.OnlyTriggerOnLastLine {
 					lines := strings.Split(output, "\n")
 					output = strings.TrimSpace(lines[len(lines)-1])
